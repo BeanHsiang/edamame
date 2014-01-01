@@ -1,0 +1,30 @@
+{
+    "name": "毛豆秒拍助手",
+    "version": "0.4.3",
+    "manifest_version": 2,
+    "description": "毛豆秒拍助手",
+    //"update_url": "",
+    "icons": {
+        "48": "icon/edamame96.png"
+    },
+    "page_action": {
+        "default_icon": "icon/edamame42.png",
+        "default_title": "毛豆秒拍助手"
+    },
+    //"homepage_url": "",
+    "web_accessible_resources": ["jquery.min.map"],
+    "permissions": ["tabs"],
+    "background": {
+        "scripts": ["background.js", "tool.js"]
+    },
+    "content_security_policy": "script-src 'self'; object-src 'self'",
+    "content_scripts": [
+        {
+            "matches": ["http://*.etao.com/*",
+                "http://*.taobao.com/*",
+                "http://*.tmall.com/*"],
+            "css": ["edamame.css"],
+            "js": ["jquery.js", "knockout-2.2.1.js", "tool.js", "edamame.js", "coin.js", "miao.js", "pinyin.js", "toneshot.js"]
+        }
+    ]
+}
