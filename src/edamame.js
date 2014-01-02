@@ -58,50 +58,6 @@ var page_tmall = {
     }
 };
 
-var page_51buy = {
-    init: function (ri) {
-        var login = $("#PageLogin").text();
-        ri.isLogin(login.indexOf("登录") == -1);
-        if (!ri.isLogin()) {
-            ri.loginUrl($("#PageLogin a:first").attr("href"));
-        }
-        $("#goods_detail_buyinfo div.wrap_btn").prepend(ri.html);
-    }
-};
-
-var page_gnome = {
-    init: function (ri) {
-        var login = $("#loginDiv span.dlzc").text();
-        ri.isLogin(login.indexOf("登录") == -1);
-        if (!ri.isLogin()) {
-            ri.loginUrl($("#loginDiv span.dlzc a:first").attr("href"));
-        }
-        $("#choose").prepend(ri.html);
-    }
-};
-
-var page_suning = {
-    init: function (ri) {
-        var login = $("#topArea p.loginInfo").text();
-        ri.isLogin(login.indexOf("登录") == -1);
-        if (!ri.isLogin()) {
-            ri.loginUrl($("#loginDiv span.dlzc a:first").attr("href"));
-        }
-        $("#addCart").parent().prepend(ri.html);
-    }
-};
-
-var page_dangdang = {
-    init: function (ri) {
-        var login = $("#nickname").text();
-        ri.isLogin(login.indexOf("登录") == -1);
-        if (!ri.isLogin()) {
-            ri.loginUrl($("#nickname a.login_link:first").attr("href"));
-        }
-        $("#newpresale").prepend(ri.html);
-    }
-};
-
 function parseInfo(html) {
     var re = /<body[\s\S]*?>[\s\S]*?<\/body>/;
     var body = $(html.match(re).toString());
@@ -148,18 +104,17 @@ $.get(curUrl, function (data) {
                 page_taobao.init(ri);
             } else if (curUrl.indexOf(host.tmall) > -1) {
                 page_tmall.init(ri);
-            } else if (curUrl.indexOf(host["51buy"]) > -1) {
-                page_51buy.init(ri);
             }
-
             ko.applyBindings(ri, $("#etaor-info").get(0));
             $.ajax({
                 url: historyUrl,
                 dataType: "html",
                 success: function (history) {
                     var price = eval("(" + history + ")");
-                    ri.lowPrice(price.meta.lowest);
-                    ri.futurePrice(price.future.price);
+                    if (price.meta) {
+                        ri.lowPrice(price.meta.lowest);
+                        ri.futurePrice(price.future.price);
+                    }
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     alert(textStatus);
