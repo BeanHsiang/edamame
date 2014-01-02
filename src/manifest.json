@@ -5,10 +5,10 @@
     "description": "毛豆秒拍助手",
     //"update_url": "",
     "icons": {
-        "48": "icon/edamame96.png"
+        "48": "icon/edamame48.png"
     },
     "page_action": {
-        "default_icon": "icon/edamame42.png",
+        "default_icon": "icon/edamame48.png",
         "default_title": "毛豆秒拍助手"
     },
     //"homepage_url": "",
