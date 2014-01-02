@@ -2,14 +2,16 @@ var re_quanpin = /(.+)(?=1)/g;
 var re_shouzimu = /(.+)(?=2)/g;
 var re_content = /[^\u4e00-\u9fa5a-zA-Z1-2]/g;
 var pinyin = new Pinyin();
-var timeHtml = '<div>服务器时间：<span style="font-size: 20px;margin-left: 10px" data-bind="text: currentFormatTime"></span></div>';
+var timeHtml = '<div>服务器时间：<span style="font-size: 20px;margin-left: 10px;border:3px solid #FF6701" data-bind="text: currentFormatTime"></span><span style="font-size: 14px;margin-left: 15px" data-bind="visible: useTime() > 0"><span data-bind="text: useTime"></span>s</span></div>';
 var localTime, serverTime, diffTime, intTimer;
-var refreshBtn;
+var refreshBtn, stopMinutes;
 var intRefreshId, intCaptchaId;
+var startTime, endTime, useTime;
 
 var timer = {
     currentTime: null,
-    currentFormatTime: ko.observable()
+    currentFormatTime: ko.observable(),
+    useTime: ko.observable(0)
 };
 
 timer.setTime = function (time) {
@@ -28,7 +30,7 @@ timer.start = function () {
     timer.setTime();
 };
 
-//    var startTime, endTime, useTime;
+
 //    var submitLimitTime = 2000;
 
 function handleCaptcha() {
@@ -36,9 +38,9 @@ function handleCaptcha() {
     var btn = $$("#J_SecKill .J_Submit")[0];
     if (answer) {
         window.clearInterval(intRefreshId);
-        window.clearInterval(intCaptchaId);
+//        window.clearInterval(intCaptchaId);
         window.clearInterval(intTimer);
-//            startTime = new Date();
+        startTime = new Date();
 //            $(answer).unbind()
         $(answer).focus();
         $(answer).bind("input", function () {
@@ -61,8 +63,9 @@ function handleCaptcha() {
         $(answer).bind("keydown", function (e) {
 //                e.stopPropagation();
             if (e.keyCode === 13) {
-//                    endTime = new Date();
-//                    useTime = endTime.getTime() - startTime.getTime();
+                endTime = new Date();
+                useTime = endTime.getTime() - startTime.getTime();
+                timer.useTime(useTime / 1000);
 //                    console.log(useTime);
 //                    if (useTime < submitLimitTime) {
 //                        console.log("延迟时间");
@@ -77,15 +80,19 @@ function handleCaptcha() {
 //            $(answer).bind("keyup keypress", function (e) {
 //                e.stopPropagation();
 //            });
+        return true;
     }
+    return false;
 }
 
 function handleRefresh() {
-    if ($("#J_SecKill").text().indexOf("秒杀已结束") == -1) {
+    if (timer.currentTime.getMinutes() >= stopMinutes && timer.currentTime.getSeconds() >= 45 && !handleCaptcha()) {
         refreshBtn.click();
-    } else {
+    }
+
+    if ($("#J_SecKill").text().indexOf("秒杀已结束") > -1) {
         window.clearInterval(intRefreshId);
-        window.clearInterval(intCaptchaId);
+//        window.clearInterval(intCaptchaId);
         window.clearInterval(intTimer);
     }
 }
@@ -103,10 +110,17 @@ $(function () {
         ko.applyBindings(timer, $("#detail").get(0));
         intTimer = window.setInterval(timer.start, 1000);
 
+        var stopTime = parseInt($("#J_SecKill .upper .time").text().split(":")[1]);
+        if (stopTime === 0) {
+            stopMinutes = 59;
+        } else {
+            stopMinutes = stopTime - 1;
+        }
+
         refreshBtn = $$("#J_SecKill .J_RefreshStatus")[0];
         if (refreshBtn) {
             intRefreshId = window.setInterval(handleRefresh, 100);
-            intCaptchaId = window.setInterval(handleCaptcha, 80);
+//            intCaptchaId = window.setInterval(handleCaptcha, 80);
         }
     }
 });
