@@ -119,7 +119,7 @@ $(function () {
 
         refreshBtn = $$("#J_SecKill .J_RefreshStatus")[0];
         if (refreshBtn) {
-            intRefreshId = window.setInterval(handleRefresh, 100);
+            intRefreshId = window.setInterval(handleRefresh, 80);
 //            intCaptchaId = window.setInterval(handleCaptcha, 80);
         }
     }
