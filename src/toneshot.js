@@ -43,7 +43,7 @@ function handleCaptcha() {
         startTime = new Date();
 //            $(answer).unbind()
         $(answer).focus();
-        $(answer).bind("input", function () {
+        $(answer).unbind("input").bind("input", function () {
             var ans = $(answer).val();
             //console.log(ans);
             if (re_content.test(ans)) {
@@ -60,7 +60,7 @@ function handleCaptcha() {
                 btn.click();
             }
         });
-        $(answer).bind("keydown", function (e) {
+        $(answer).unbind("keydown").bind("keydown", function (e) {
 //                e.stopPropagation();
             if (e.keyCode === 13) {
                 endTime = new Date();
@@ -86,14 +86,15 @@ function handleCaptcha() {
 }
 
 function handleRefresh() {
-    if (timer.currentTime.getMinutes() >= stopMinutes && timer.currentTime.getSeconds() >= 45 && !handleCaptcha()) {
-        refreshBtn.click();
-    }
-
-    if ($("#J_SecKill").text().indexOf("秒杀已结束") > -1) {
+    if (refreshBtn.style.display == "none" || $("#J_SecKill").text().indexOf("秒杀已结束") > -1) {
         window.clearInterval(intRefreshId);
 //        window.clearInterval(intCaptchaId);
         window.clearInterval(intTimer);
+        return;
+    }
+
+    if (timer.currentTime.getMinutes() >= stopMinutes && timer.currentTime.getSeconds() >= 45 && !handleCaptcha()) {
+        refreshBtn.click();
     }
 }
 
