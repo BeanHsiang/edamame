@@ -4,8 +4,8 @@ var re_content = /[^\u4e00-\u9fa5a-zA-Z1-2]/g;
 var pinyin = new Pinyin();
 var timeHtml = '<div>服务器时间：<span style="font-size: 20px;margin-left: 10px;border:3px solid #FF6701" data-bind="text: currentFormatTime"></span><span style="font-size: 14px;margin-left: 15px" data-bind="visible: useTime() > 0"><span data-bind="text: useTime"></span>s</span></div>';
 var localTime, serverTime, diffTime, intTimer;
-var refreshBtn, stopMinutes;
-var intRefreshId, intCaptchaId;
+var refreshBtn, stopTicks;
+var intCaptchaId;
 var startTime, endTime, useTime;
 
 var timer = {
@@ -37,11 +37,9 @@ function handleCaptcha() {
     var answer = $("#J_SecKill input.answer-input")[0];
     var btn = $$("#J_SecKill .J_Submit")[0];
     if (answer) {
-        window.clearInterval(intRefreshId);
-//        window.clearInterval(intCaptchaId);
+        window.clearInterval(intCaptchaId);
         window.clearInterval(intTimer);
         startTime = new Date();
-//            $(answer).unbind()
         $(answer).focus();
         $(answer).unbind("input").bind("input", function () {
             var ans = $(answer).val();
@@ -62,7 +60,8 @@ function handleCaptcha() {
         });
         $(answer).unbind("keydown").bind("keydown", function (e) {
 //                e.stopPropagation();
-            if (e.keyCode === 13) {
+            if (e.keyCode == 13) {
+                btn.click();
                 endTime = new Date();
                 useTime = endTime.getTime() - startTime.getTime();
                 timer.useTime(useTime / 1000);
@@ -73,29 +72,22 @@ function handleCaptcha() {
 //                            btn.click();
 //                        }, submitLimitTime - useTime);
 //                    } else {
-                btn.click();
+
 //                    }
             }
         });
 //            $(answer).bind("keyup keypress", function (e) {
 //                e.stopPropagation();
 //            });
-        return true;
-    }
-    return false;
-}
-
-function handleRefresh() {
-    if (refreshBtn.style.display == "none" || $("#J_SecKill").text().indexOf("秒杀已结束") > -1) {
-        window.clearInterval(intRefreshId);
-//        window.clearInterval(intCaptchaId);
-        window.clearInterval(intTimer);
-        return;
-    }
-
-    if (timer.currentTime.getMinutes() >= stopMinutes && timer.currentTime.getSeconds() >= 45 && !handleCaptcha()) {
+    } else if (timer.currentTime.getTime() >= stopTicks) {
         refreshBtn.click();
     }
+
+//    if (refreshBtn.style.display == "none" || $("#J_SecKill").text().indexOf("秒杀已结束") > -1) {
+//        window.clearInterval(intCaptchaId);
+//        window.clearInterval(intTimer);
+//        return;
+//    }
 }
 
 $(function () {
@@ -111,17 +103,17 @@ $(function () {
         ko.applyBindings(timer, $("#detail").get(0));
         intTimer = window.setInterval(timer.start, 1000);
 
-        var stopTime = parseInt($("#J_SecKill .upper .time").text().split(":")[1]);
-        if (stopTime === 0) {
-            stopMinutes = 59;
-        } else {
-            stopMinutes = stopTime - 1;
-        }
+        var timeStrArr = $("#J_SecKill .upper .time").text().split(":");
+        var stopTime = new Date();
+        stopTime.setHours(parseInt(timeStrArr[0]));
+        stopTime.setMinutes(parseInt(timeStrArr[1]) - 1);
+        stopTime.setSeconds(40);
+        stopTime.setMilliseconds(0)
+        stopTicks = stopTime.getTime();
 
         refreshBtn = $$("#J_SecKill .J_RefreshStatus")[0];
         if (refreshBtn) {
-            intRefreshId = window.setInterval(handleRefresh, 80);
-//            intCaptchaId = window.setInterval(handleCaptcha, 80);
+            intCaptchaId = window.setInterval(handleCaptcha, 80);
         }
     }
 });
