@@ -1,4 +1,4 @@
-var re_content = /[^\u4e00-\u9fa5a-zA-Z]/g;
+﻿var re_content = /[^\u4e00-\u9fa5a-zA-Z]/g;
 var pinyin = new Pinyin();
 var timeHtml = '<div>服务器时间：<span style="font-size: 20px;margin-left: 10px;border:3px solid #FF6701" data-bind="text: currentFormatTime"></span><span style="font-size: 14px;margin-left: 15px" data-bind="visible: useTime() > 0"><span data-bind="text: useTime"></span>s</span></div>';
 var localTime, serverTime, diffTime, intTimer;
@@ -39,16 +39,8 @@ function handleCaptcha() {
         window.clearInterval(intTimer);
         startTime = new Date();
         $(answer).focus();
-        $(answer).unbind("input").bind("input", function () {
-            var ans = $(answer).val();
-            //console.log(ans);
-            if (re_content.test(ans)) {
-                ans = ans.replace(re_content, "");
-                $(answer).val(ans);
-            }
-        });
+
         $(answer).unbind("keydown").bind("keydown", function (e) {
-            e.stopPropagation();
             if (e.keyCode == 13) {
                 btn.click();
                 endTime = new Date();
@@ -63,8 +55,9 @@ function handleCaptcha() {
 //                    } else {
 
 //                    }
-                return false;
+                return true;
             }
+            e.stopPropagation();
             var ans = $(answer).val();
             if (e.keyCode == 49) {
                 $(answer).val(pinyin.getFullChars(ans).toLowerCase());
@@ -73,6 +66,8 @@ function handleCaptcha() {
             } else if (e.keyCode == 50) {
                 $(answer).val(pinyin.getCamelChars(ans).toLowerCase());
                 btn.click();
+                return false;
+            } else if (e.keyCode == 219 || e.keyCode == 220 || e.keyCode == 221 || e.keyCode == 222) {
                 return false;
             }
         });
