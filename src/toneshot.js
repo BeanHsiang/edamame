@@ -42,6 +42,12 @@ function handleCaptcha() {
 
         $(answer).unbind("keydown").bind("keydown", function (e) {
             if (e.keyCode == 13) {
+                var ans = $(answer).val();
+                //console.log(ans);
+                if (re_content.test(ans)) {
+                    ans = ans.replace(re_content, "");
+                    $(answer).val(ans);
+                }
                 btn.click();
                 endTime = new Date();
                 useTime = endTime.getTime() - startTime.getTime();
